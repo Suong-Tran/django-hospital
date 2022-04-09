@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <a href="{% url 'patients:patient-list' %}">Back</a>
+    <hr />
+    <h1>Assign a physician to this patient</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{form|crispy}}
+        <button type="submit">Submit</button>
+    </form>
+    
+
+{% endblock content %}
