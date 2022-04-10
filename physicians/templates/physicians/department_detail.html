@@ -16,8 +16,34 @@
             <p class="lg:w-2/3 mx-auto leading-relaxed text-base">
                 The physcian of {{department.name}} department
             </p>
+            <a href="{% url 'physicians:department-update' department.pk %}" class="hover:text-blue-500">Update</a>
+            <a href="{% url 'physicians:department-delete' department.pk %}" class="hover:text-blue-500">Delete</a>
         </div>
         <div class="lg:w-2/3 w-full mx-auto overflow-auto">
+            <table class="table-auto w-full text-left whitespace-no-wrap mb-3">
+                <thead>
+                    <tr>
+                        <th
+                            class="px-4 py-3 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-200 rounded-tl rounded-bl">
+                            Department Information
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <th>
+                        <div class="flex border-t border-gray-300 py-2">
+                            <span class="text-gray-500">Description</span>
+                            <span class="ml-auto text-gray-900">{{ department.description }}</span>
+                        </div>
+                        <div class="flex border-t border-gray-300 py-2">
+                            <span class="text-gray-500">Abbreviation</span>
+                            <span class="ml-auto text-gray-900">{{ department.abbreviation }}</span>
+                        </div>
+                    </th>
+                    
+                </tbody>
+                
+            </table>
 
             <table class="table-auto w-full text-left whitespace-no-wrap">
                 <thead>

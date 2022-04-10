@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 
-from patients.models import Physician
+from patients.models import Department, Physician
 
 User = get_user_model()
 
@@ -21,4 +21,13 @@ class PhysicianDepartmentUpdateForm(forms.ModelForm):
         model = Physician
         fields = (
             'department',
+        )
+
+class DepartmentModelForm(forms.ModelForm):
+    class Meta:
+        model = Department
+        fields = (
+            'name',
+            'abbreviation',
+            'description',
         )

@@ -7,7 +7,7 @@ from django.shortcuts import render, reverse
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 from patients.models import Department, Physician
-from .forms import PhysicianDepartmentUpdateForm, PhysicianModelForm
+from .forms import DepartmentModelForm, PhysicianDepartmentUpdateForm, PhysicianModelForm
 from .mixins import TeamleadRequiredMixin
 from django.core.mail import send_mail
 
@@ -136,7 +136,7 @@ class DepartmentDetailView(LoginRequiredMixin, generic.DeleteView):
         
         return queryset
 
-class DepartmentUpdateView(LoginRequiredMixin, generic.UpdateView):
+class PhysicianDepartmentUpdateView(TeamleadRequiredMixin, generic.UpdateView):
     template_name = "physicians/physician_department_update.html"
     form_class = PhysicianDepartmentUpdateForm
 
@@ -151,3 +151,57 @@ class DepartmentUpdateView(LoginRequiredMixin, generic.UpdateView):
 
     def get_success_url(self):
         return reverse("physicians:physician-detail", kwargs={"pk":self.get_object().id})
+
+class DepartmentCreateView(TeamleadRequiredMixin, generic.CreateView):
+    template_name = "physicians/department_create.html"
+    form_class = DepartmentModelForm
+
+    def get_success_url(self):
+        return reverse("physicians:department-list")
+
+    def form_valid(self, form):
+        department = form.save(commit=False)
+        department.team_lead = self.request.user.userprofile
+        department.save()
+        return super(DepartmentCreateView, self).form_valid(form)
+
+
+class DepartmentUpdateView(TeamleadRequiredMixin, generic.UpdateView):
+    template_name = "physicians/department_update.html"
+    form_class = DepartmentModelForm
+
+    def get_success_url(self):
+        return reverse("physicians:department-list")
+
+    def get_queryset(self):
+        user = self.request.user
+        # initial queryset of leads for the entire organisation
+        if user.is_teamlead:
+            queryset = Department.objects.filter(
+                team_lead=user.userprofile
+            )
+        else:
+            queryset = Department.objects.filter(
+                team_lead=user.team
+            )
+        return queryset
+
+
+class DepartmentDeleteView(TeamleadRequiredMixin, generic.DeleteView):
+    template_name = "physicians/department_delete.html"
+
+    def get_success_url(self):
+        return reverse("physicians:department-list")
+
+    def get_queryset(self):
+        user = self.request.user
+        # initial queryset of leads for the entire organisation
+        if user.is_teamlead:
+            queryset = Department.objects.filter(
+                team_lead=user.userprofile
+            )
+        else:
+            queryset = Department.objects.filter(
+                team_lead=user.team
+            )
+        return queryset
