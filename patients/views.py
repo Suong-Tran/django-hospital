@@ -2,8 +2,8 @@ from distutils.command.clean import clean
 from msilib.schema import ListView
 from re import template
 from django.shortcuts import render, redirect, reverse
-from .models import Patient, Physician
-from .forms import AssignPhysicianForm, PatientForm, PatientModelForm, CustomUserCreationForm
+from .models import Patient, Physician, FollowUp
+from .forms import AssignPhysicianForm, FollowUpModelForm, PatientForm, PatientModelForm, CustomUserCreationForm
 from django.views import generic
 from django.core.mail import send_mail
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -137,8 +137,62 @@ class AssignPhysicianView(TeamleadRequiredMixin, generic.FormView):
         patient.save()
         return super(AssignPhysicianView,self).form_valid(form)
 
+class FollowUpCreateView(LoginRequiredMixin, generic.CreateView):
+    template_name = "patients/followup_create.html"
+    form_class = FollowUpModelForm
 
+    def get_success_url(self):
+        return reverse("patients:patient-detail", kwargs={"pk": self.kwargs["pk"]})
 
+    def get_context_data(self, **kwargs):
+        context = super(FollowUpCreateView, self).get_context_data(**kwargs)
+        context.update({
+            "patient": Patient.objects.get(pk=self.kwargs["pk"])
+        })
+        return context
+
+    def form_valid(self, form):
+        patient = Patient.objects.get(pk=self.kwargs["pk"])
+        followup = form.save(commit=False)
+        followup.patient = patient
+        followup.save()
+        return super(FollowUpCreateView, self).form_valid(form)
+
+class FollowUpUpdateView(LoginRequiredMixin, generic.UpdateView):
+    template_name = "patients/followup_update.html"
+    form_class = FollowUpModelForm
+
+    def get_queryset(self):
+        user = self.request.user
+        # initial queryset of leads for the entire organisation
+        if user.is_teamlead:
+            queryset = FollowUp.objects.filter(patient__team=user.userprofile)
+        else:
+            queryset = FollowUp.objects.filter(patient__team=user.agent.organisation)
+            # filter for the agent that is logged in
+            queryset = queryset.filter(patient__physician__user=user)
+        return queryset
+
+    def get_success_url(self):
+        return reverse("patients:patient-detail", kwargs={"pk": self.get_object().patient.id})
+
+class FollowUpDeleteView(LoginRequiredMixin, generic.DeleteView):
+    template_name = "patients/followup_delete.html"
+
+    def get_success_url(self):
+        followup = FollowUp.objects.get(id=self.kwargs["pk"])
+        return reverse("patients:patient-detail", kwargs={"pk": followup.patient.pk})
+
+    def get_queryset(self):
+        user = self.request.user
+        # initial queryset of leads for the entire organisation
+        if user.is_teamlead:
+            queryset = FollowUp.objects.filter(patient__team=user.userprofile)
+        else:
+            queryset = FollowUp.objects.filter(patient__team=user.physician.team)
+            # filter for the agent that is logged in
+            queryset = queryset.filter(patient__physician__user=user)
+        return queryset
 
 """ def patient_update(request, pk):
     patient = Patient.objects.get(id=pk)

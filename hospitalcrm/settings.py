@@ -127,6 +127,9 @@ STATICFILES_DIRS = [
     BASE_DIR / "static"
 ]
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = "media_root"
+
 STATIC_ROOT = "static_root"
 
 AUTH_USER_MODEL = 'patients.User'

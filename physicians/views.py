@@ -57,7 +57,6 @@ class PhysicianDetailView(TeamleadRequiredMixin, generic.DetailView):
     def get_queryset(self):
         user = self.request.user
         queryset = Physician.objects.filter(team=user.userprofile)
-        queryset = queryset.filter(user=user)  
         
         return queryset
 
@@ -70,8 +69,7 @@ class PhysicianUpdateView(TeamleadRequiredMixin, generic.UpdateView):
 
     def get_queryset(self):
         user = self.request.user
-        queryset = Physician.objects.filter(team=user.userprofile)
-        queryset = queryset.filter(user=user) 
+        queryset = Physician.objects.filter(team=user.userprofile) 
         print(queryset)
         return queryset
     

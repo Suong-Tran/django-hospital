@@ -1,56 +1,57 @@
 {% extends "base.html" %}
 
 {% block content %}
-<section class="text-gray-600 body-font">
+
+<section class="text-gray-700 body-font">
     <div class="container px-5 py-24 mx-auto">
-        <div class="flex flex-col text-center w-full mb-20">
-            <h1 class="sm:text-4xl text-3xl font-medium title-font mb-2 text-gray-900">Department</h1>
-            <p class="lg:w-2/3 mx-auto leading-relaxed text-base">The departments</p>
+      <div class="flex flex-col text-center w-full mb-20">
+        <h1 class="sm:text-4xl text-3xl font-medium title-font mb-2 text-gray-900">Departments</h1>
+        <p class="lg:w-2/3 mx-auto leading-relaxed text-base">
+            Available departments in Medicare Hospital
+        </p>
+      </div>
+      <div class="lg:w-2/3 w-full mx-auto overflow-auto">
+        <table class="table-auto w-full text-left whitespace-no-wrap">
+          <thead>
+            <tr>
+              <th class="px-4 py-3 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-200 rounded-tl rounded-bl">Name</th>
+              <th class="px-4 py-3 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-200">Abbreviation</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for department in departments %}
+                <tr>
+                    <td class="px-4 py-3">
+                      <a class="hover:text-blue-500" href="{% url 'physicians:department-detail' department.pk %}">{{ department.name }}</a>
+                    </td>
+                    <td class="px-4 py-3">{{department.abbreviation}}</td>
+                </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <hr />
+        <div>
+            <h2 class="text-center mx-auto leading-relaxed text-base font-medium text-gray-900">Unassigned Physician: {{unassigned_physicians_count }}</h2>
         </div>
-        <div class="lg:w-2/3 w-full mx-auto overflow-auto">
-            <table class="table-auto w-full text-left whitespace-no-wrap">
-                <thead>
+        <table class="table-auto w-full text-left whitespace-no-wrap">
+            <thead>
+                <tr>
+                    <th
+                        class="px-4 py-3 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-100 rounded-tl rounded-bl">
+                        Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for physician in unassigned_physicians %}
                     <tr>
-                        <th
-                            class="px-4 py-3 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-100 rounded-tl rounded-bl">
-                            Plan</th>
-                        <th class="px-4 py-3 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-100">
-                            Abbreviation</th>
+                        <td class="px-4 py-3" ><a href="{% url 'physicians:physician-detail' physician.pk %}">{{physician.user.first_name}} {{physician.user.last_name}}</a></td>
                     </tr>
-                </thead>
-                <tbody>
-                    {% for department in departments %}
-                        <tr>
-                            <td class="px-4 py-3">
-                                <a href="{% url 'physicians:department-detail' department.pk %}">{{department.name}}</a>
-                            </td>
-                            <td class="px-4 py-3">{{department.abbreviation}}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <div>
-                <h2>Unassigned Physician: {{unassigned_physicians_count }}</h2>
-            </div>
-            <table class="table-auto w-full text-left whitespace-no-wrap">
-                <thead>
-                    <tr>
-                        <th
-                            class="px-4 py-3 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-100 rounded-tl rounded-bl">
-                            Name</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for physician in unassigned_physicians %}
-                        <tr>
-                            <td class="px-4 py-3">{{physician.user.first_name}} {{physician.user.last_name}}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                {% endfor %}
+            </tbody>
+        </table>
+      </div>
     </div>
-</section>
+  </section>
 
 
 {% endblock content %}

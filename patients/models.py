@@ -19,15 +19,31 @@ class Patient(models.Model):
     age = models.IntegerField(default=0)
     team = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     physician = models.ForeignKey('Physician', null=True, blank=True,on_delete=models.SET_NULL)
+    date_added = models.DateTimeField(auto_now_add=True)
+    phone_number = models.CharField(max_length=20)
+    email = models.EmailField()
     
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
+def handle_upload_follow_ups(instance, filename):
+    return f"patient_followups/patient_{instance.patient.pk}/{filename}"
+
+
+class FollowUp(models.Model):
+    patient = models.ForeignKey(Patient, related_name="followups", on_delete=models.CASCADE)
+    date_added = models.DateTimeField(auto_now_add=True)
+    message = models.TextField(blank=True, null=True)
+    file = models.FileField(null=True, blank=True, upload_to=handle_upload_follow_ups)
+
+    def __str__(self):
+        return f"{self.patient.first_name} {self.patient.last_name}"
 
 class Physician(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     team = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     department = models.ForeignKey("Department", related_name="physicians" ,null=True, blank=True,on_delete=models.SET_NULL)
+    date_added = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.user.username

@@ -1,6 +1,6 @@
 from urllib import request
 from django import forms
-from .models import Patient, Physician, User
+from .models import FollowUp, Patient, Physician, User
 from django.contrib.auth.forms import UserCreationForm, UsernameField
 from django.contrib.auth import get_user_model
 
@@ -11,7 +11,9 @@ class PatientModelForm(forms.ModelForm):
             'first_name',
             'last_name',
             'age',
-            'physician'
+            'email',
+            'phone_number',
+            'physician',
         )
 
 class PatientForm(forms.Form):
@@ -33,3 +35,11 @@ class AssignPhysicianForm(forms.Form):
         physicians = Physician.objects.filter(team=request.user.userprofile)
         super(AssignPhysicianForm,self).__init__(*args, **kwargs)
         self.fields["physician"].queryset = physicians
+
+class FollowUpModelForm(forms.ModelForm):
+    class Meta:
+        model = FollowUp
+        fields = (
+            'message',
+            'file'
+        )
